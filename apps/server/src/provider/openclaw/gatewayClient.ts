@@ -55,7 +55,10 @@ export type GatewayEvent = {
 export type OpenClawGatewayConnection = {
   readonly hello: HelloOk;
   readonly pairingRequestId: string | undefined;
-  readonly request: (method: string, params?: unknown) => Effect.Effect<unknown, OpenClawGatewayError>;
+  readonly request: (
+    method: string,
+    params?: unknown,
+  ) => Effect.Effect<unknown, OpenClawGatewayError>;
   readonly events: Stream.Stream<GatewayEvent>;
   readonly close: Effect.Effect<void>;
 };
@@ -65,7 +68,10 @@ type Pending = {
   readonly fail: (error: OpenClawGatewayError) => void;
 };
 
-function errorFromShape(error: GatewayErrorShape | undefined, fallback: string): OpenClawGatewayError {
+function errorFromShape(
+  error: GatewayErrorShape | undefined,
+  fallback: string,
+): OpenClawGatewayError {
   return new OpenClawGatewayError({
     detail: error?.message?.trim() || fallback,
     ...(error?.code ? { code: error.code } : {}),
@@ -172,7 +178,7 @@ export function connectOpenClawGateway(input: {
       void Effect.runFork(Deferred.succeed(handshakeError, error));
     });
 
-    yield* Effect.async<void, OpenClawGatewayError>((resume) => {
+    yield* Effect.callback<void, OpenClawGatewayError>((resume) => {
       if (socket.readyState === WebSocket.OPEN) {
         resume(Effect.void);
         return;
@@ -188,17 +194,19 @@ export function connectOpenClawGateway(input: {
 
     const challengeOrError = yield* Deferred.await(challenge).pipe(
       Effect.race(Deferred.await(handshakeError).pipe(Effect.flip)),
-      Effect.timeoutFail({
+      Effect.timeoutOrElse({
         duration: Duration.seconds(8),
-        onTimeout: () =>
-          new OpenClawGatewayError({
-            detail: "Timed out waiting for Gateway connect.challenge.",
-          }),
+        orElse: () =>
+          Effect.fail(
+            new OpenClawGatewayError({
+              detail: "Timed out waiting for Gateway connect.challenge.",
+            }),
+          ),
       }),
     );
 
     const request = (method: string, params?: unknown) =>
-      Effect.async<unknown, OpenClawGatewayError>((resume) => {
+      Effect.callback<unknown, OpenClawGatewayError>((resume) => {
         if (closed || socket.readyState !== WebSocket.OPEN) {
           resume(Effect.fail(new OpenClawGatewayError({ detail: "Gateway is not connected." })));
           return;
@@ -225,7 +233,7 @@ export function connectOpenClawGateway(input: {
     });
 
     const connectId = "t3-connect";
-    const helloPromise = Effect.async<unknown, OpenClawGatewayError>((resume) => {
+    const helloPromise = Effect.callback<unknown, OpenClawGatewayError>((resume) => {
       pending.set(connectId, {
         succeed: (payload) => resume(Effect.succeed(payload)),
         fail: (error) => resume(Effect.fail(error)),
@@ -248,11 +256,7 @@ export function connectOpenClawGateway(input: {
         role: "operator",
         scopes: [...OPENCLAW_OPERATOR_SCOPES],
         caps: ["tool-events", "approvals", "exec-approvals"],
-        auth: authToken
-          ? storedToken
-            ? { deviceToken: storedToken }
-            : { token: authToken }
-          : {},
+        auth: authToken ? (storedToken ? { deviceToken: storedToken } : { token: authToken }) : {},
         locale: "en-US",
         userAgent: "t3-code/openclaw",
         device: proof,
@@ -260,10 +264,12 @@ export function connectOpenClawGateway(input: {
     });
 
     const helloPayload = yield* helloPromise.pipe(
-      Effect.timeoutFail({
+      Effect.timeoutOrElse({
         duration: Duration.seconds(10),
-        onTimeout: () =>
-          new OpenClawGatewayError({ detail: "Timed out waiting for Gateway hello-ok." }),
+        orElse: () =>
+          Effect.fail(
+            new OpenClawGatewayError({ detail: "Timed out waiting for Gateway hello-ok." }),
+          ),
       }),
     );
     const parsedHello = parseHelloOk(helloPayload);
@@ -300,7 +306,10 @@ export function connectOpenClawGateway(input: {
     const close = Effect.sync(() => {
       closed = true;
       socket.close();
-    }).pipe(Effect.tap(() => Fiber.interrupt(ticker)), Effect.asVoid);
+    }).pipe(
+      Effect.tap(() => Fiber.interrupt(ticker)),
+      Effect.asVoid,
+    );
 
     return {
       hello: parsedHello,
