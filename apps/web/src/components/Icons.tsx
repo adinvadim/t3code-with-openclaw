@@ -647,6 +647,15 @@ export const AntigravityIcon: Icon = (props) => (
   </svg>
 );
 
+export const OpenClawIcon: Icon = (props) => (
+  <svg {...props} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      className="fill-neutral-900 dark:fill-neutral-100"
+      d="M7.2 8.4c0-2.1 1.4-3.9 3.3-4.3.4-1.4 1.7-2.4 3.2-2.4 1.9 0 3.4 1.5 3.4 3.4 0 .5-.1 1-.3 1.4 1.6.8 2.7 2.4 2.7 4.3v1.1c1.4.6 2.4 2 2.4 3.6 0 2.2-1.8 4-4 4h-.4c-.5 1.7-2 3-3.9 3h-2.4c-1.8 0-3.4-1.2-3.9-2.9h-.5c-2.1 0-3.8-1.7-3.8-3.8 0-1.6 1-3 2.4-3.6V11c0-1.1.4-2.1 1.1-2.8-.2-.2-.3-.5-.3-.8Zm3.3.3c-1.1.3-1.9 1.3-1.9 2.5v.9h5.2V11c0-1.4-1.1-2.6-2.5-2.6-.3 0-.6 0-.8.3ZM8.4 13.9v1.2c0 .7.4 1.3 1 1.6.3-1.1 1.3-1.9 2.5-1.9h1.6c1.2 0 2.2.8 2.5 1.9.6-.3 1-1 1-1.6v-1.2H8.4Z"
+    />
+  </svg>
+);
+
 export const OpenCodeIcon: Icon = (props) => (
   <svg {...props} viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#opencode__clip0_1311_94969)">

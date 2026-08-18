@@ -39,6 +39,12 @@ directory to route session and turn operations for a thread, so callers name a t
 Adding a driver means writing the driver plus adapter and adding it to `BUILT_IN_DRIVERS`. No
 orchestration, contract, or client change is required for the common case.
 
+## OpenClaw (this fork)
+
+This tree also registers `openclaw`. Thin entries live next to the other drivers; the Gateway
+client lives in `apps/server/src/provider/openclaw/`. Design and merge rules:
+[openclaw.md](./openclaw.md). User guide: [OpenClaw](../user/providers-openclaw.md).
+
 ## How provider work is requested
 
 Clients never call a provider directly. They dispatch orchestration commands over the RPC method

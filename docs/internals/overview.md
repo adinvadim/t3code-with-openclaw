@@ -28,6 +28,9 @@ there, never in the client.
 └────────────────────────────────────────────────┘
 ```
 
+This fork also registers OpenClaw. It is not a CLI spawn: the server attaches to a running
+Gateway. See [openclaw.md](./openclaw.md).
+
 ## The RPC boundary
 
 The client/server contract is an Effect RPC group, not a hand-rolled push protocol. [`rpc.ts`][rpc]

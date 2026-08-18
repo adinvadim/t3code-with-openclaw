@@ -10,6 +10,7 @@ This is a living glossary for T3 Code. It explains what common terms mean in thi
 - [Thread timeline](#thread-timeline)
 - [Orchestration](#orchestration)
 - [Provider runtime](#provider-runtime)
+- [OpenClaw](#openclaw)
 - [Checkpointing](#checkpointing)
 
 ## Concepts
@@ -94,7 +95,7 @@ The live backend agent implementation and its event stream. The main service is 
 
 #### Provider
 
-The backend agent runtime that actually performs work. Five drivers ship built in: Codex, Claude, Cursor, Grok, and OpenCode. See [ProviderService.ts][14], [ProviderAdapter.ts][15], and [CodexAdapter.ts][17] as a representative adapter.
+The backend agent runtime that actually performs work. Upstream ships five drivers: Codex, Claude, Cursor, Grok, and OpenCode. This fork also registers OpenClaw. See [ProviderService.ts][14], [ProviderAdapter.ts][15], [CodexAdapter.ts][17] as a representative adapter, and [openclaw.md](./openclaw.md) for the overlay.
 
 #### Session
 
@@ -115,6 +116,24 @@ Controls how assistant text reaches the thread timeline. In [the contracts][1], 
 #### Snapshot
 
 A point-in-time view of state. The word is used in multiple layers, including orchestration, provider, and checkpointing. See [ProjectionSnapshotQuery.ts][10], [ProviderAdapter.ts][15], and [CheckpointStore.ts][19].
+
+### OpenClaw
+
+#### Gateway
+
+OpenClaw's control plane. Owns agents, sessions, transcripts, and channels. T3 attaches to a Gateway that is already running. See [openclaw.md](./openclaw.md).
+
+#### OpenClaw agent
+
+An isolated OpenClaw persona (`dev`, `archie`, …) with its own workspace and session store. In T3 it is a composer option (`modelSelection.options[{ id: "agent" }]`), not a T3 project.
+
+#### Agent workspace
+
+That agent's home directory (usually `~/.openclaw/workspace-<id>`). Default cwd for OpenClaw tools. The OpenClaw adapter ignores the T3 project's `workspaceRoot`.
+
+#### Isolated T3 session
+
+A Gateway session created for one T3 thread, keyed `agent:<agentId>:t3:<t3ThreadId>`. It is not `agent:<id>:main` and is not imported from Telegram or the OpenClaw dashboard.
 
 ### Checkpointing
 
@@ -152,6 +171,7 @@ The file patch and changed-file summary for one turn. It is usually computed in 
 
 - [Architecture overview][24]
 - [Provider architecture][16]
+- [OpenClaw driver](./openclaw.md)
 - [Permission modes][18]
 - [Workspace layout][2]
 
