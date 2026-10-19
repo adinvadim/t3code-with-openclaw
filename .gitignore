@@ -36,3 +36,6 @@ node_modules/
 *.log
 .env*
 !.env.example
+
+# Local release-note recovery inodes; kept beside fragments for atomic rename.
+.changes/.recovery/
