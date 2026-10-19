@@ -145,3 +145,8 @@ Full glossary with file links: `docs/internals/glossary.md`
 
 - Don't verify with browsers or computer use unless the user explicitly agrees or requests it.
 - Security is important, but should not be over-indexed on, especially for dev mode/maintainer-only features.
+
+## Release notes
+
+- User-visible changes add one unique English `.changes/<id>.md` fragment (`## Changes`, one-line bullets). Pure internal/test changes need none. Do not hand-edit shared pending changelog notes.
+- The existing release workflow assembles fragments from the exact channel range; stable finalization updates CHANGELOG.md and consumes exact included identities. Nightly keeps its native no-commit lifecycle. See `.changes/README.md`.
